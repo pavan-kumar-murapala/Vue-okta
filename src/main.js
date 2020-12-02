@@ -1,17 +1,20 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import Auth from "@okta/okta-vue";
-import sampleConfig from "@/config";
-// import Vue from 'vue'
-import router from "./router";
-import store from "./store";
-import "./polyfills";
+import Vue from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import './polyfills'
+import './assets/styles/custom.scss'
 
-//Vue.use()
-const app = createApp(App)
-    .use(Auth, sampleConfig.oidc)
-    .use(router)
-    .use(store)
+Vue.config.productionTip = false
 
-var vm = app.mount("#app");
-console.log(vm)
+// Install BootstrapVue
+Vue.use(BootstrapVue)
+    // Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin)
+
+new Vue({
+    router,
+    store,
+    render: h => h(App)
+}).$mount('#app')

@@ -1,65 +1,63 @@
-import {
-    createRouter,
-    createWebHistory
-} from "vue-router";
-import Auth from "@okta/okta-vue";
-
-import HomeComponent from "@/components/Home";
-import LoginComponent from "@/components/Login";
-import ProfileComponent from "@/components/Profile";
-import MessagesComponent from "@/components/Messages";
 import Vue from 'vue'
+import Router from 'vue-router'
+import 'semantic-ui-css/semantic.min.css'
 
-import "semantic-ui-css/semantic.min.css";
+import Auth from '@okta/okta-vue'
 
-const routes = [{
-        path: "/",
-        component: HomeComponent,
-    },
-    {
-        path: "/login",
-        component: LoginComponent,
-    },
-    {
-        path: "/login/callback",
-        component: Auth.handleCallback(),
-    },
-    {
-        path: "/profile",
-        component: ProfileComponent,
-        meta: {
-            requiresAuth: true,
+import HomeComponent from '@/components/Home'
+import LoginComponent from '@/components/Login'
+import ProfileComponent from '@/components/Profile'
+import MessagesComponent from '@/components/Messages'
+
+import sampleConfig from '@/config'
+
+Vue.use(Router)
+Vue.use(Auth, sampleConfig.oidc)
+
+const router = new Router({
+    mode: 'history',
+    routes: [{
+            path: '/',
+            component: HomeComponent
         },
-    },
-    {
-        path: "/messages",
-        component: MessagesComponent,
-        meta: {
-            requiresAuth: true,
+        {
+            path: '/login',
+            component: LoginComponent
         },
-    },
-    {
-        path: "/:pathMatch(.*)*",
-        redirect: "/",
-    },
-];
-
-const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
-    routes,
-});
+        {
+            path: '/login/callback',
+            component: Auth.handleCallback()
+        },
+        {
+            path: '/profile',
+            component: ProfileComponent,
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/messages',
+            component: MessagesComponent,
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '*',
+            redirect: '/'
+        }
+    ]
+})
 
 const onAuthRequired = async(from, to, next) => {
     if (from.matched.some(record => record.meta.requiresAuth) && !(await Vue.prototype.$auth.isAuthenticated())) {
         // Navigate to custom login page
-        next({
-            path: '/login'
-        })
+        next({ path: '/login' })
     } else {
         next()
     }
 }
 
-router.beforeEach(onAuthRequired);
+router.beforeEach(onAuthRequired)
 
 export default router
